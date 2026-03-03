@@ -64,6 +64,9 @@
             <button onclick="start()" style="width: 60px; height: 30px; left: 150px;" id="startBtn">
                 Start
             </button>
+            <div>
+                <p id="TTimer">30</p>
+            </div>
             </div>
         </div>
     </header>
@@ -115,10 +118,24 @@
         let canOpen = true;
         let timeoutId = null;
         let gameFinished = false;
-
+        timer = 30;
+        function timerMove(){setTimeout(function(){
+            if(matchedPairs==5)
+            {
+                
+            }else if(timer>0){
+                timer-=1
+                TTimer.innerText=timer
+                timerMove()
+            }
+            else{
+                alert("Oh,No! You lose!");
+                Finish()
+            }
+        },1000)}
         function start() {
             if (gameFinished) return;
-            
+                timerMove()
             resetGame();
             
             cards = $('.card');
@@ -243,8 +260,18 @@
 
         function Finish() {
             for(let i = 0; i < cards.length; i++) {
-                $(cards[i]).removeClass().addClass('card');
-                $(cards[i]).css('background-image', '');
+                $(cards[i]).removeClass('closed_card').addClass('card');
+                card = $(cards[i]).find('img')
+                // $(cards[i]).css('background-image', '');
+                if (cards[i].classList.contains('heart')) 
+                {
+                    console.log("1")
+                    cards[i].style.backgroundImage =  'url("heart.png")';
+                }  
+                else if (cards[i].classList.contains('circle')) cards[i].style.backgroundImage =  'url("circle.png")';
+                else if (cards[i].classList.contains('triangle')) cards[i].style.backgroundImage =  'url("triangle.png")';
+                else if (cards[i].classList.contains('star')) cards[i].style.backgroundImage =  'url("star.png")';
+                else if (cards[i].classList.contains('block')) cards[i].style.backgroundImage =  'url("block.png")';
             }
             resetGame();
             
@@ -262,6 +289,7 @@
             openedCards = [];
             matchedPairs = 0;
             canOpen = true;
+            timer = 30;
         }
     </script>
 </body>
