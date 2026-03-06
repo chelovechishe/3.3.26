@@ -67,12 +67,19 @@
             <div>
                 <p id="TTimer">30</p>
             </div>
+            <div>
+                <p>1 = 10 cards</p>
+                <input type="number" name="" id="fieldSize" value="1" min="1" max="10">
+                <button id="changeButton" onclick="ChangeField()">
+                    Change field
+                </button>
+            </div>
             </div>
         </div>
     </header>
     <main>
-        <div>
-            <div>
+        <div id="bigContainer">
+            <div class="container">
                 <button>
                     <img alt="" class="card">
                 </button>
@@ -89,7 +96,7 @@
                     <img alt="" class="card">
                 </button>
             </div>
-            <div>
+            <div class="container">
                 <button>
                     <img alt="" class="card">
                 </button>
@@ -119,10 +126,40 @@
         let timeoutId = null;
         let gameFinished = false;
         timer = 30;
-        function timerMove(){setTimeout(function(){
-            if(matchedPairs==5)
+        field_size=1
+
+        function ChangeField(){
+            console.log($("#fieldSize").val())
+            console.log($("#fieldSize").val()>=10)
+            
+            field_size= $("#fieldSize").val();
+            
+            console.log(field_size>=10)
+            console.log(field_size.type)
+            console.log(field_size)
+            if(field_size<0)
             {
-                
+                $("#fieldSize").val(1)
+                field_size=1
+            }
+            else if(field_size>10)
+            {
+                $("#fieldSize").val(10)
+                field_size=10
+            }
+            $("#bigContainer").empty();
+            // element = $(".container").clone()
+            // element.addClass("cloned");
+            for(i=0;i<field_size*2;i++)
+            {
+                $("#bigContainer").append('<div class="container"> <button><img alt="" class="card"></button><button><img alt="" class="card"></button><button><img alt="" class="card"></button><button><img alt="" class="card"></button><button><img alt="" class="card"></button></div>')
+            }
+        }
+
+        function timerMove(){setTimeout(function(){
+            if(matchedPairs==field_size*5||gameFinished)
+            {
+                return
             }else if(timer>0){
                 timer-=1
                 TTimer.innerText=timer
@@ -131,26 +168,41 @@
             else{
                 alert("Oh,No! You lose!");
                 Finish()
+                resetGame();
+                document.getElementById('startBtn').disabled = false;
             }
         },1000)}
+
         function start() {
             if (gameFinished) return;
                 timerMove()
             resetGame();
             
+            timer = field_size * 15
+
+            document.getElementById("changeButton").disabled=true
+
             cards = $('.card');
             console.log("Всего карточек: " + cards.length);
             
             cardsImages = ["circle","circle","triangle","triangle","star","star","block","block","heart","heart"];
             
-            cardsImages = cardsImages.sort(() => Math.random() - 0.5);
             console.log("Перемешанные карточки: " + cardsImages);
-            
-            for(let i = 0; i < cards.length; i++) {
-                $(cards[i]).removeClass().addClass('closed_card');
-                $(cards[i]).addClass(cardsImages[i]);
-                $(cards[i]).css('background-image', 'url("card.png")');
+            for(i=0;i<field_size;i++)
+            {
+                cardsImages = cardsImages.sort(() => Math.random() - 0.5);
+                for(j=10*i;j<10+10*i;j++)
+                {
+                    $(cards[j]).removeClass().addClass('closed_card');
+                    $(cards[j]).addClass(cardsImages[j-10*i]);
+                    $(cards[j]).css('background-image', 'url("card.png")');
+                }
             }
+            // for(let i = 0; i < cards.length; i++) {
+            //     $(cards[i]).removeClass().addClass('closed_card');
+            //     $(cards[i]).addClass(cardsImages[i]);
+            //     $(cards[i]).css('background-image', 'url("card.png")');
+            // }
             document.getElementById('startBtn').innerText = "Finish";
             document.getElementById('startBtn').onclick = Finish;
             
@@ -166,8 +218,6 @@
                 if (!canOpen || openedCards.length >= 2 || !img.hasClass('closed_card') || img.hasClass('matched') || gameFinished) {
                     return;
                 }
-                
-                // Открываем карточку
                 openCard(img);
             });
         }
@@ -223,14 +273,15 @@
                 setTimeout(function() {
                     card1.element.addClass('matched');
                     card2.element.addClass('matched');
-                    
+                    timer += field_size
                     matchedPairs++;
                     openedCards = [];
                     canOpen = true;
                     
                     // Проверяем не закончилась ли игра
-                    if (matchedPairs === 5) {
+                    if (matchedPairs === field_size * 5) {
                         
+                        document.getElementById("changeButton").disabled=false
                         document.getElementById('startBtn').innerText = "Start";
                         document.getElementById('startBtn').onclick = start;
                         setTimeout(function() {
@@ -277,10 +328,7 @@
             
             gameFinished = true;
             
-            document.getElementById('startBtn').innerText = "Start";
-            document.getElementById('startBtn').onclick = function() { return false; };
-            document.getElementById('startBtn').style.pointerEvents = 'none';
-            document.getElementById('startBtn').style.opacity = '0.5';
+            document.getElementById('startBtn').disabled = true;
             
             $('button').off('click');
         }
@@ -290,6 +338,9 @@
             matchedPairs = 0;
             canOpen = true;
             timer = 30;
+            document.getElementById("changeButton").disabled=false
+            document.getElementById('startBtn').innerText = "Start";
+            document.getElementById('startBtn').onclick = start;
         }
     </script>
 </body>
